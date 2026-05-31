@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="row align-items-center">
+        <div class="col-lg-6 fade-in-up">
+            <p class="section-subtitle">Barber Club</p>
+            <h1 class="section-title" style="font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: 4px;">
+                <span class="text-gold">ÉBANO</span>
+            </h1>
+            <div class="gold-divider" style="margin: 20px 0;"></div>
+            <p class="lead" style="color: var(--text-muted); font-size: 1.05rem; letter-spacing: 2px; text-transform: uppercase;">
+                Donde el arte de la barbería se encuentra con la elegancia. Cortes de autor, estilo clásico y la mejor experiencia para caballeros.
+            </p>
+            <div class="d-flex gap-3 mt-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'appointment_create' %}" class="btn btn-gold btn-lg">
+                    <i class="bi bi-calendar-check"></i> Agendar Cita
+                </a>
+                {% else %}
+                <a href="{% url 'register' %}" class="btn btn-gold btn-lg">
+                    <i class="bi bi-person-plus"></i> Registrarse
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-gold btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6 text-center mt-5 mt-lg-0 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="position-relative d-inline-block">
+                <svg width="280" height="280" viewBox="0 0 200 200" style="filter: drop-shadow(0 0 30px rgba(212,175,55,.2));">
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="#d4af37" stroke-width="2"/>
+                    <text x="100" y="118" text-anchor="middle" fill="#d4af37" font-size="82" font-weight="900" font-family="Montserrat, sans-serif">É</text>
+                </svg>
+                <div class="position-absolute top-0 start-0 end-0 bottom-0" style="background: radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%); border-radius: 50%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 pt-4">
+    <div class="col-12 text-center mb-5">
+        <p class="section-subtitle">¿Por qué Ébano?</p>
+        <h2 style="font-size: 2rem;">Experiencia Premium</h2>
+        <div class="gold-divider"></div>
+    </div>
+    <div class="col-md-4 text-center mb-4 fade-in-up">
+        <div class="card h-100 p-4">
+            <i class="bi bi-star-fill feature-icon mb-3"></i>
+            <h5 class="fw-bold">Barberos Expertos</h5>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Profesionales con años de experiencia y técnica impecable.</p>
+        </div>
+    </div>
+    <div class="col-md-4 text-center mb-4 fade-in-up" style="animation-delay: 0.1s;">
+        <div class="card h-100 p-4">
+            <i class="bi bi-clock-fill feature-icon mb-3"></i>
+            <h5 class="fw-bold">Horario Flexible</h5>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Agenda tu cita en el horario que mejor se adapte a ti.</p>
+        </div>
+    </div>
+    <div class="col-md-4 text-center mb-4 fade-in-up" style="animation-delay: 0.2s;">
+        <div class="card h-100 p-4">
+            <i class="bi bi-shield-check feature-icon mb-3"></i>
+            <h5 class="fw-bold">Calidad Garantizada</h5>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Servicio premium al mejor precio. Tu estilo, nuestra prioridad.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

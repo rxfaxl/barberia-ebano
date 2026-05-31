@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Citas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <p class="section-subtitle mb-0">Tus reservas</p>
+        <h2 class="section-title" style="font-size: 1.8rem;">Mis Citas</h2>
+    </div>
+    <a href="{% url 'appointment_create' %}" class="btn btn-gold">
+        <i class="bi bi-plus-circle"></i> Nueva Cita
+    </a>
+</div>
+<div class="gold-divider mb-4" style="margin-left: 0;"></div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Barbero</th>
+                <th>Servicio</th>
+                <th>Precio</th>
+                <th>Método de pago</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                <td>{{ appointment.time|time:"H:i" }}</td>
+                <td style="color: var(--gold);">{{ appointment.barber.user.get_full_name }}</td>
+                <td>{{ appointment.service.name }}</td>
+                <td class="text-gold fw-bold">S/{{ appointment.service.price }}</td>
+                <td>
+                    {% if appointment.payment_method == 'yape' %}
+                    <span class="badge bg-info">Yape</span>
+                    <small class="d-block text-muted" style="font-size: 0.7rem;">Nro: {{ yape_number }}</small>
+                    {% else %}
+                    <span class="badge" style="background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.2);">En barbería</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if appointment.status == 'confirmed' %}bg-success{% elif appointment.status == 'cancelled' %}bg-danger{% else %}bg-info{% endif %}">
+                        {{ appointment.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if appointment.status == 'confirmed' %}
+                    <a href="{% url 'appointment_cancel' appointment.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Cancelar esta cita?')">
+                        Cancelar
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--gold); opacity: 0.4;"></i>
+                    <p class="text-muted mt-2">No tienes citas agendadas.</p>
+                    <a href="{% url 'appointment_create' %}" class="btn btn-gold mt-2">Agendar Ahora</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

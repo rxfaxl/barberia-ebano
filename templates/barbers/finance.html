@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Finanzas{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <p class="section-subtitle mb-0">Dashboard</p>
+        <h2 class="section-title" style="font-size: 1.8rem;">Finanzas</h2>
+        <div class="gold-divider" style="margin-left: 0;"></div>
+    </div>
+    <a href="{% url 'finance_export_csv' %}" class="btn btn-outline-gold mt-2">
+        <i class="bi bi-download"></i> Exportar CSV
+    </a>
+</div>
+
+<div class="row mb-4 fade-in-up">
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card text-center p-3 stat-card">
+            <div class="stat-label">Hoy</div>
+            <div class="stat-value">S/{{ today_totals.total|default:0|floatformat:0 }}</div>
+            <div class="stat-sub">{{ today_totals.count|default:0 }} citas</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card text-center p-3 stat-card">
+            <div class="stat-label">Esta Semana</div>
+            <div class="stat-value">S/{{ week_totals.total|default:0|floatformat:0 }}</div>
+            <div class="stat-sub">{{ week_totals.count|default:0 }} citas</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card text-center p-3 stat-card">
+            <div class="stat-label">Este Mes</div>
+            <div class="stat-value">S/{{ month_totals.total|default:0|floatformat:0 }}</div>
+            <div class="stat-sub">{{ month_totals.count|default:0 }} citas</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+        <div class="card text-center p-3 stat-card stat-card-total">
+            <div class="stat-label">Total General</div>
+            <div class="stat-value">S/{{ all_totals.total|default:0|floatformat:0 }}</div>
+            <div class="stat-sub">{{ all_totals.count|default:0 }} citas</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 fade-in-up" style="animation-delay: 0.1s;">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="section-card-title"><i class="bi bi-bar-chart-fill me-2"></i>Últimos 6 Meses</h5>
+                <div class="chart-container">
+                    {% for m in months_data %}
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar-group">
+                            <div class="chart-bar" title="S/{{ m.total|floatformat:0 }}">
+                                <div class="chart-bar-fill" style="height: {% widthratio m.total max_month_total 100 %}%;"></div>
+                            </div>
+                        </div>
+                        <div class="chart-label">{{ m.label }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-2" style="color: var(--text-muted); font-size: 0.75rem;">Meses / Ingresos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="section-card-title"><i class="bi bi-trophy-fill me-2"></i>Servicios más populares</h5>
+                {% for s in by_service %}
+                <div class="rank-item">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="rank-name">{{ s.service__name }}</span>
+                        <span class="text-gold fw-bold">S/{{ s.total|floatformat:0 }}</span>
+                    </div>
+                    <div class="rank-bar-bg">
+                        <div class="rank-bar-fill" style="width: {% widthratio s.total|floatformat:0 max_service_total|floatformat:0 100 %}%;"></div>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">{{ s.count }} citas</div>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted);">Sin datos aún.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 fade-in-up" style="animation-delay: 0.15s;">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="section-card-title"><i class="bi bi-calendar-week-fill me-2"></i>Esta Semana</h5>
+                <div class="chart-container chart-week">
+                    {% for d in week_days %}
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar-group">
+                            <div class="chart-bar" title="S/{{ d.total|floatformat:0 }}">
+                                <div class="chart-bar-fill week-bar" style="height: {% if week_totals.total %}{% widthratio d.total|floatformat:0 week_totals.total|floatformat:0 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                        <div class="chart-label">{{ d.label }}</div>
+                        <div style="color: var(--gold); font-size: 0.65rem;">{{ d.date }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="section-card-title"><i class="bi bi-credit-card-2-front-fill me-2"></i>Método de Pago</h5>
+                {% for method in by_method %}
+                <div class="method-item">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span>
+                            {% if method.payment_method == 'yape' %}
+                            <i class="bi bi-phone"></i> Yape
+                            {% else %}
+                            <i class="bi bi-cash"></i> En barbería
+                            {% endif %}
+                        </span>
+                        <span class="text-gold fw-bold">S/{{ method.total|floatformat:0 }}</span>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">{{ method.count }} citas</div>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted);">Sin datos aún.</p>
+                {% endfor %}
+                <hr style="border-color: var(--card-border);">
+                <div class="d-flex justify-content-between">
+                    <span style="color: var(--text-muted);">Promedio por cita</span>
+                    <span class="text-gold fw-bold">
+                        {% if all_totals.count %}
+                        S/{{ all_totals.total|floatformat:0 }}
+                        {% else %}S/0{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="section-card-title"><i class="bi bi-pie-chart-fill me-2"></i>Estado de Citas</h5>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-dot" style="background: #28a745;"></span>
+                        <span>Confirmadas</span>
+                        <span class="fw-bold ms-auto">{{ status_counts.confirmed|default:0 }}</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot" style="background: #17a2b8;"></span>
+                        <span>Completadas</span>
+                        <span class="fw-bold ms-auto">{{ status_counts.completed|default:0 }}</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot" style="background: #dc3545;"></span>
+                        <span>Canceladas</span>
+                        <span class="fw-bold ms-auto">{{ status_counts.cancelled|default:0 }}</span>
+                    </div>
+                </div>
+                {% if cancelled_totals.total %}
+                <hr style="border-color: var(--card-border);">
+                <div class="d-flex justify-content-between">
+                    <span style="color: #dc3545;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Pérdida estimada</span>
+                    <span style="color: #dc3545;" class="fw-bold">- S/{{ cancelled_totals.total|floatformat:0 }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card fade-in-up" style="animation-delay: 0.2s;">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <h5 class="section-card-title mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Transacciones</h5>
+            <span style="color: var(--text-muted); font-size: 0.8rem;">{{ recent|length }} registros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Monto</th>
+                        <th>Pago</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in recent %}
+                    <tr>
+                        <td>{{ a.date|date:"d/m/Y" }}</td>
+                        <td>{{ a.user.get_full_name|default:a.user.username }}</td>
+                        <td>{{ a.service.name }}</td>
+                        <td class="text-gold fw-bold">S/{{ a.service.price|floatformat:0 }}</td>
+                        <td>
+                            {% if a.payment_method == 'yape' %}
+                            <span class="badge bg-info">Yape</span>
+                            {% else %}
+                            <span class="badge badge-barberia">Barbería</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if a.status == 'confirmed' %}bg-success{% elif a.status == 'completed' %}bg-info{% endif %}">
+                                {{ a.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4" style="color: var(--text-muted);">No hay transacciones aún.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

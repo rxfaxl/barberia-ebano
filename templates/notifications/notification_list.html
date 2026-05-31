@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <p class="section-subtitle">Tus alertas</p>
+    <h2 class="section-title">Notificaciones</h2>
+    <div class="gold-divider"></div>
+</div>
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8">
+        <div class="list-group">
+            {% for notification in notifications %}
+            <div class="list-group-item d-flex justify-content-between align-items-start" style="background: var(--ebano-card); border: 1px solid var(--card-border); color: var(--text-light); margin-bottom: 8px; border-radius: 8px; {% if not notification.read %}border-color: rgba(212,175,55,0.3);{% endif %}">
+                <div>
+                    <span style="{% if not notification.read %}color: var(--gold); font-weight: 600;{% endif %}">{{ notification.message }}</span>
+                    <br><small style="color: var(--text-muted);">{{ notification.created_at|timesince }}</small>
+                </div>
+                {% if not notification.read %}
+                <a href="{% url 'notification_read' notification.pk %}" class="btn btn-outline-gold btn-sm">Leída</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-bell-slash" style="font-size: 3rem; color: var(--gold); opacity: 0.4;"></i>
+                <p class="text-muted mt-2">No tienes notificaciones.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

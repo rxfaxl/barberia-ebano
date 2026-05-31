@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversación{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'inbox' %}" class="btn btn-outline-gold btn-sm">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-4" style="border-bottom: 1px solid var(--card-border);">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; background: rgba(212,175,55,0.1);">
+                        <i class="bi bi-person text-gold" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--gold);">
+                            {% if user.is_staff %}
+                                {{ conversation.user.get_full_name|default:conversation.user.username }}
+                            {% else %}
+                                Barbería Ébano
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4" style="min-height: 350px; max-height: 450px; overflow-y: auto; background: rgba(0,0,0,0.2);">
+                {% for msg in messages %}
+                <div class="d-flex mb-3 {% if msg.sender == user %}justify-content-end{% endif %}">
+                    <div class="px-3 py-2 rounded-3" style="max-width: 75%; {% if msg.sender == user %}background: var(--gold); color: var(--ebano);{% else %}background: rgba(255,255,255,0.05); color: var(--text-light); border: 1px solid var(--card-border);{% endif %}">
+                        <div style="font-size: 0.9rem;">{{ msg.text|linebreaksbr }}</div>
+                        <div style="font-size: 0.65rem; {% if msg.sender == user %}color: rgba(0,0,0,0.5);{% else %}color: var(--text-muted);{% endif %} margin-top: 4px; text-align: right;">
+                            {{ msg.created_at|date:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5" style="color: var(--text-muted);">
+                    <i class="bi bi-chat" style="font-size: 2rem; opacity: 0.4;"></i>
+                    <p class="mt-2">No hay mensajes aún. Escribe algo.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-body p-4" style="border-top: 1px solid var(--card-border);">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="text" class="form-control" placeholder="Escribe tu mensaje..." required autofocus>
+                        <button type="submit" class="btn btn-gold">
+                            <i class="bi bi-send"></i> Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

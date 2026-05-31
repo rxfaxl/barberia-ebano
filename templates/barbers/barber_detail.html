@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ barber.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                {% if barber.photo %}
+                <img src="{{ barber.photo.url }}" class="rounded-circle mb-4" alt="{{ barber.user.get_full_name }}" style="width: 180px; height: 180px; object-fit: cover; border: 2px solid var(--card-border);">
+                {% else %}
+                <div class="mx-auto mb-4 rounded-circle d-flex align-items-center justify-content-center" style="width: 180px; height: 180px; background: rgba(212,175,55,0.05); border: 2px solid var(--card-border);">
+                    <i class="bi bi-person" style="font-size: 4.5rem; color: var(--gold); opacity: 0.5;"></i>
+                </div>
+                {% endif %}
+                <h2 style="font-family: var(--font-heading); color: var(--gold);">{{ barber.user.get_full_name|default:barber.user.username }}</h2>
+                {% if barber.phone %}
+                <p style="color: var(--text-muted);"><i class="bi bi-telephone"></i> {{ barber.phone }}</p>
+                {% endif %}
+                <div class="gold-divider"></div>
+                <p class="lead" style="color: var(--text-muted); font-size: 1rem;">{{ barber.bio }}</p>
+                {% if user.is_authenticated and barber.available %}
+                <a href="{% url 'appointment_create' %}" class="btn btn-gold btn-lg mt-4">
+                    <i class="bi bi-calendar-check"></i> Agendar con {{ barber.user.first_name }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'barber_list' %}" class="btn btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
