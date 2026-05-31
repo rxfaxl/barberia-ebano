@@ -9,3 +9,5 @@ db.sqlite3
 dist/
 android/
 node_modules/
+capacitor-app/
+*.apk

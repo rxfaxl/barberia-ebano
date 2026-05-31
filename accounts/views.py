@@ -2,16 +2,27 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import IntegrityError
+import logging
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+
+logger = logging.getLogger(__name__)
 
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Cuenta creada exitosamente.')
-            return redirect('home')
+            try:
+                user = form.save()
+                login(request, user)
+                messages.success(request, 'Cuenta creada exitosamente.')
+                return redirect('home')
+            except IntegrityError as e:
+                logger.error(f'Error creating user: {e}')
+                messages.error(request, 'Error al crear la cuenta. El usuario o email ya existe.')
+            except Exception as e:
+                logger.error(f'Unexpected error during registration: {e}')
+                messages.error(request, 'Error inesperado al crear la cuenta. Intenta de nuevo.')
     else:
         form = UserRegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
